@@ -6,10 +6,23 @@
 
 <style>
   body {
-    font-family: Arial;
+    font-family: Arial, sans-serif;
     text-align: center;
-    background: #f2f2f2;
+    background: linear-gradient(135deg, #fdfbfb, #ebedee);
     padding-top: 40px;
+  }
+
+  h1 {
+    margin-bottom: 20px;
+  }
+
+  #game {
+    background: white;
+    width: 320px;
+    margin: auto;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
   }
 
   img {
@@ -17,26 +30,57 @@
     height: 220px;
     object-fit: cover;
     border-radius: 12px;
-    border: 2px solid #ccc;
+    border: 2px solid #ddd;
     margin-bottom: 15px;
   }
 
   input {
     padding: 10px;
     font-size: 16px;
-    width: 220px;
+    width: 90%;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    outline: none;
   }
 
   button {
     padding: 10px 15px;
-    margin: 5px;
+    margin: 8px 5px;
     font-size: 16px;
     cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    transition: 0.2s;
+  }
+
+  button:hover {
+    transform: scale(1.05);
+  }
+
+  #checkBtn {
+    background: #4CAF50;
+    color: white;
+  }
+
+  #nextBtn {
+    background: #2196F3;
+    color: white;
   }
 
   #result {
-    font-size: 20px;
+    font-size: 18px;
     margin-top: 15px;
+    min-height: 25px;
+  }
+
+  .ok {
+    color: green;
+    font-weight: bold;
+  }
+
+  .ko {
+    color: red;
+    font-weight: bold;
   }
 </style>
 
@@ -45,18 +89,20 @@
 
 <h1>🍎 Jeu des Fruits</h1>
 
-<img id="fruitImage" src="">
+<div id="game">
 
-<br>
+  <img id="fruitImage" src="" alt="fruit">
 
-<input type="text" id="answer" placeholder="Nom, code ou couleur">
+  <input type="text" id="answer" placeholder="Nom du fruit">
 
-<br>
+  <br>
 
-<button onclick="verifier()">Valider</button>
-<button onclick="nouveauFruit()">Suivant</button>
+  <button id="checkBtn" onclick="verifier()">Valider</button>
+  <button id="nextBtn" onclick="nouveauFruit()">Suivant</button>
 
-<p id="result"></p>
+  <p id="result"></p>
+
+</div>
 
 <script>
 
@@ -64,26 +110,28 @@ let fruits = [];
 let fruitActuel = null;
 
 // 📥 Charger le CSV
-fetch("fruits.csv")
-  .then(response => response.text())
+fetch("BDD.csv")
+  .then(res => res.text())
   .then(data => {
+
     const lignes = data.trim().split("\n").slice(1);
 
     fruits = lignes.map(ligne => {
-      const [nom, code, couleur, image] = ligne.split(",");
+
+      const [libelle, response1, nomImage, image] = ligne.split(";");
 
       return {
-        nom: nom.trim(),
-        code: code.trim(),
-        couleur: couleur.trim(),
-        image: image.trim()
+        libelle: libelle?.trim(),
+        reponse: response1?.trim(),
+        nomImage: nomImage?.trim(),
+        image: image?.trim()
       };
     });
 
     nouveauFruit();
   });
 
-// 🎲 choisir un fruit aléatoire
+// 🎲 nouveau fruit
 function nouveauFruit() {
   if (fruits.length === 0) return;
 
@@ -92,21 +140,26 @@ function nouveauFruit() {
   document.getElementById("fruitImage").src = fruitActuel.image;
   document.getElementById("answer").value = "";
   document.getElementById("result").textContent = "";
+  document.getElementById("result").className = "";
 }
 
 // ✅ vérifier réponse
 function verifier() {
-  const reponse = document.getElementById("answer").value.toLowerCase().trim();
 
-  if (
-    reponse === fruitActuel.nom.toLowerCase() ||
-    reponse === fruitActuel.code.toLowerCase() ||
-    reponse === fruitActuel.couleur.toLowerCase()
-  ) {
+  const reponse = document.getElementById("answer").value
+    .toLowerCase()
+    .trim();
+
+  const bonneReponse = fruitActuel.reponse.toLowerCase();
+
+  if (reponse === bonneReponse) {
     document.getElementById("result").textContent = "✅ Correct !";
+    document.getElementById("result").className = "ok";
   } else {
     document.getElementById("result").textContent =
-      "❌ Faux ! Réponse : " + fruitActuel.nom;
+      "❌ Faux ! Réponse : " + fruitActuel.reponse;
+
+    document.getElementById("result").className = "ko";
   }
 }
 
