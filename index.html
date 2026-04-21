@@ -109,7 +109,7 @@
 let fruits = [];
 let fruitActuel = null;
 
-// 📥 Charger le CSV
+// 📥 Charger le CSV GitHub (séparateur ;)
 fetch("BDD.csv")
   .then(res => res.text())
   .then(data => {
@@ -118,11 +118,11 @@ fetch("BDD.csv")
 
     fruits = lignes.map(ligne => {
 
-      const [libelle, response1, nomImage, image] = ligne.split(";");
+      const [libelle, reponse1, nomImage, image] = ligne.split(";");
 
       return {
         libelle: libelle?.trim(),
-        reponse: response1?.trim(),
+        reponse: reponse1?.trim(),
         nomImage: nomImage?.trim(),
         image: image?.trim()
       };
@@ -131,7 +131,7 @@ fetch("BDD.csv")
     nouveauFruit();
   });
 
-// 🎲 nouveau fruit
+// 🎲 choisir un fruit aléatoire
 function nouveauFruit() {
   if (fruits.length === 0) return;
 
@@ -141,6 +141,8 @@ function nouveauFruit() {
   document.getElementById("answer").value = "";
   document.getElementById("result").textContent = "";
   document.getElementById("result").className = "";
+
+  console.log("Image chargée :", fruitActuel.image);
 }
 
 // ✅ vérifier réponse
